@@ -12,6 +12,7 @@ class Game {
     ~Game();
     void Initialize();
     void Run();
+    void Setup();
     void ProcessInput();
     void Update();
     void Render();
