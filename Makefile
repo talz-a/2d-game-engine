@@ -1,5 +1,7 @@
+CXX = g++-15
+
 build:
-	g++ -Wall -std=c++17 \
+	$(CXX) -Wall -std=c++17 \
 		`sdl2-config --cflags` \
 		-I./libs \
 		src/*.cpp \
