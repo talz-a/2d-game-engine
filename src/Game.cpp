@@ -12,7 +12,7 @@ Game::Game() {
     Logger::Log("Game has started!");
 }
 
-Game::~Game() { Logger::Err("Game has been deconstructed!"); }
+Game::~Game() { Logger::Log("Game has been deconstructed!"); }
 
 void Game::Initialize() {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
