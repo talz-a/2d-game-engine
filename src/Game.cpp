@@ -9,10 +9,10 @@
 
 Game::Game() {
     isRunning = false;
-    Logger::Log("Game has started!");
+    Logger::Log("Game constructor has been called!");
 }
 
-Game::~Game() { Logger::Log("Game has been deconstructed!"); }
+Game::~Game() { Logger::Log("Game destructor has been called!"); }
 
 void Game::Initialize() {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
