@@ -24,8 +24,7 @@ void Game::Initialize() {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     windowWidth = 800;   // displayMode.w;
     windowHeight = 600;  // displayMode.h;
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth,
-                              windowHeight, SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
     if (!window) {
         Logger::Err("Error creating SDL Window.");
         return;
@@ -68,7 +67,6 @@ void Game::Update() {
     if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
 
     float deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
-
     millisecsPreviousFrame = SDL_GetTicks();
 
     playerPositon += playerVelocity * deltaTime;
@@ -82,13 +80,14 @@ void Game::Render() {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 
-    SDL_Rect dstRect = {.x = static_cast<int>(playerPositon.x),
-                        .y = static_cast<int>(playerPositon.y),
-                        .w = 32,
-                        .h = 32};
+    SDL_Rect dstRect = {
+        .x = static_cast<int>(playerPositon.x),
+        .y = static_cast<int>(playerPositon.y),
+        .w = 32,
+        .h = 32
+    };
     SDL_RenderCopy(renderer, texture, NULL, &dstRect);
     SDL_DestroyTexture(texture);
-
     SDL_RenderPresent(renderer);
 }
 
