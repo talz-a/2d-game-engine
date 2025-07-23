@@ -5,7 +5,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Logger.hpp"
+#include "../Logger/Logger.hpp"
 
 Game::Game() {
     isRunning = false;
