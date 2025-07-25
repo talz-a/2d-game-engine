@@ -2,6 +2,9 @@
 
 #include <bitset>
 #include <vector>
+#include <unordered_map>
+#include <typeindex>
+#include <set>
 
 constexpr unsigned int MAX_COMPONENTS = 32;
 
@@ -12,8 +15,7 @@ struct IComponent {
         static int nextId;
 };
 
-template <typename T>
-class Component: public IComponent {
+template <typename T> class Component: public IComponent {
     static int GetId() {
         static auto id = nextId++;
         return id;
@@ -57,8 +59,7 @@ class IPool {
         virtual ~IPool() {}
 };
 
-template <typename T>
-class Pool: public IPool {
+template <typename T> class Pool: public IPool {
     private:
         std::vector<T> data;
 
@@ -78,11 +79,52 @@ class Pool: public IPool {
 class Registry {
     private:
         int numEntities = 0;
+
+        // [vector index = componentId], [pool index = entityId]
         std::vector<IPool*> componentPools;
+
+        // [vector index = entity id]
+        std::vector<Signature> entityComponentSignatures;
+
+        std::unordered_map<std::type_index, System*> systems;
+
+        std::set<Entity> entitiesToBeAdded;
+        std::set<Entity> entitiesToBeKilled;
+
+    public:
+        Registry() = default;
+        void Update();
+        Entity CreateEntity();
+
+        template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+
+        void AddEntityToSystem(Entity entity);
+
 };
 
-template <typename TComponent>
-void System::RequireComponent() {
+
+template <typename TComponent> void System::RequireComponent() {
     const auto componentId = Component<TComponent>::GetId();
     componentSignature.set(componentId);
+}
+
+template <typename TComponent, typename ...TArgs> void Registry::AddComponent(Entity entity, TArgs&& ...args) {
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    if (componentId >= componentPools.size()) componentPools.resize(componentId + 1, nullptr);
+
+    if (!componentPools[componentId]) {
+        Pool<TComponent>* newComponentPool = new Pool<TComponent>();
+        componentPools[componentId] = newComponentPool;
+    }
+
+    Pool<TComponent>* componentPool = componentPools[componentId];
+    if (entityId >= componentPool->GetSize()) {
+        componentPool->Resize(numEntities);
+    }
+
+    TComponent newComponent(std::forward<TArgs>(args)...);
+    componentPool->Set(entityId, newComponent);
+    entityComponentSignatures[entityId].set(componentId);
 }
