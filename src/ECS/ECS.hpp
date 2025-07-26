@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include <memory>
 
 constexpr unsigned int MAX_COMPONENTS = 32;
 
@@ -86,6 +87,7 @@ class Registry {
         // [vector index = entity id]
         std::vector<Signature> entityComponentSignatures;
 
+        // [Map key = system type id]
         std::unordered_map<std::type_index, System*> systems;
 
         std::set<Entity> entitiesToBeAdded;
@@ -98,9 +100,14 @@ class Registry {
 
         template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
         template <typename TComponent> void RemoveComponent(Entity entity);
-        template <typename TComponent> bool HasComponent(Entity entity);
+        template <typename TComponent> bool HasComponent(Entity entity) const;
 
+        template <typename TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
+        template <typename TSystem> void RemoveSystem();
+        template <typename TSystem> bool HasSystem() const;
+        template <typename TSystem> TSystem& GetSystem() const;
 
+        void AddEntityToSystem(Entity entity);
 };
 
 
@@ -137,8 +144,26 @@ template <typename TComponent> void Registry::RemoveComponent(Entity entity) {
     entityComponentSignatures[entityId].set(componentId, false);
 }
 
-template <typename TComponent> bool Registry::HasComponent(Entity entity) {
+template <typename TComponent> bool Registry::HasComponent(Entity entity) const {
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
     return entityComponentSignatures[entityId].test(componentId);
+}
+
+template <typename TSystem, typename ...TArgs> void Registry::AddSystem(TArgs&& ...args) {
+    TSystem* newSystem(new TSystem(std::forward<TArgs>(args)...));
+    systems.insert({std::type_index(typeid(TSystem)), newSystem});
+}
+
+template <typename TSystem> void Registry::RemoveSystem() {
+    systems.erase(std::type_index(typeid(TSystem)));
+}
+
+template <typename TSystem> bool Registry::HasSystem() const {
+    return systems.contains(std::type_index(typeid(TSystem)));
+}
+
+template <typename TSystem> TSystem& Registry::GetSystem() const {
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    return *(std::static_pointer_cast<TSystem>(system->second));
 }
