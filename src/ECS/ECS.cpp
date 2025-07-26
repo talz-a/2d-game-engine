@@ -1,6 +1,8 @@
 #include "ECS.hpp"
 #include "../Logger/Logger.hpp"
 
+int IComponent::nextId = 0;
+
 int Entity::GetId() const { return id; }
 
 void System::AddEntityToSystem(Entity entity) { entities.push_back(entity); }
