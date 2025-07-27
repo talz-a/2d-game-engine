@@ -82,13 +82,13 @@ class Registry {
         int numEntities = 0;
 
         // [vector index = componentId], [pool index = entityId]
-        std::vector<IPool*> componentPools;
+        std::vector<std::shared_ptr<IPool>> componentPools;
 
         // [vector index = entity id]
         std::vector<Signature> entityComponentSignatures;
 
         // [Map key = system type id]
-        std::unordered_map<std::type_index, System*> systems;
+        std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
         std::set<Entity> entitiesToBeAdded;
         std::set<Entity> entitiesToBeKilled;
@@ -107,7 +107,7 @@ class Registry {
         template <typename TSystem> bool HasSystem() const;
         template <typename TSystem> TSystem& GetSystem() const;
 
-        void AddEntityToSystem(Entity entity);
+        void AddEntityToSystems(Entity entity);
 };
 
 
@@ -123,11 +123,11 @@ template <typename TComponent, typename ...TArgs> void Registry::AddComponent(En
     if (componentId >= componentPools.size()) componentPools.resize(componentId + 1, nullptr);
 
     if (!componentPools[componentId]) {
-        Pool<TComponent>* newComponentPool = new Pool<TComponent>();
+        std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
         componentPools[componentId] = newComponentPool;
     }
 
-    Pool<TComponent>* componentPool = componentPools[componentId];
+    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
     if (entityId >= componentPool->GetSize()) {
         componentPool->Resize(numEntities);
     }
@@ -151,7 +151,7 @@ template <typename TComponent> bool Registry::HasComponent(Entity entity) const 
 }
 
 template <typename TSystem, typename ...TArgs> void Registry::AddSystem(TArgs&& ...args) {
-    TSystem* newSystem(new TSystem(std::forward<TArgs>(args)...));
+    std::shared_ptr<TSystem> newSystem = std::make_shared<TSystem>(std::forward<TArgs>(args)...);
     systems.insert({std::type_index(typeid(TSystem)), newSystem});
 }
 

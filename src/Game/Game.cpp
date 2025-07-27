@@ -4,9 +4,11 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
+#include <memory>
 
 Game::Game() {
     isRunning = false;
+    registry = std::make_unique<Registry>();
     Logger::Log("Game constructor has been called!");
 }
 
@@ -53,9 +55,8 @@ void Game::ProcessInput() {
 }
 
 void Game::Setup() {
-    // TODO: Entity tank = registry.CreateEntity();
-    // tank.AddComponent<TransformComponent>();
-    // tanks.AddComponent<BoxColiderComponent>();
+    Entity tank = registry->CreateEntity();
+    Entity bike = registry->CreateEntity();
 }
 
 void Game::Update() {
