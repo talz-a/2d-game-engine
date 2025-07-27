@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Logger/Logger.hpp"
 #include <bitset>
 #include <vector>
 #include <unordered_map>
@@ -17,10 +18,11 @@ struct IComponent {
 };
 
 template <typename T> class Component: public IComponent {
-    static int GetId() {
-        static auto id = nextId++;
-        return id;
-    }
+    public:
+        static int GetId() {
+            static auto id = nextId++;
+            return id;
+        }
 };
 
 class Entity {
@@ -120,7 +122,7 @@ template <typename TComponent, typename ...TArgs> void Registry::AddComponent(En
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
 
-    if (componentId >= componentPools.size()) componentPools.resize(componentId + 1, nullptr);
+    if (static_cast<size_t>(componentId) >= componentPools.size()) componentPools.resize(componentId + 1, nullptr);
 
     if (!componentPools[componentId]) {
         std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
@@ -135,6 +137,8 @@ template <typename TComponent, typename ...TArgs> void Registry::AddComponent(En
     TComponent newComponent(std::forward<TArgs>(args)...);
     componentPool->Set(entityId, newComponent);
     entityComponentSignatures[entityId].set(componentId);
+
+    Logger::Log("Component id = " + std::to_string(componentId) + " was added to entity id " + std::to_string(entityId));
 }
 
 

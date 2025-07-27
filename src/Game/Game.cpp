@@ -1,6 +1,9 @@
 #include "Game.hpp"
 #include "../Logger/Logger.hpp"
 #include "../ECS/ECS.hpp"
+#include "../Components/TransformComponent.hpp"
+#include "../Components/RigidBodyComponent.hpp"
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
@@ -24,7 +27,7 @@ void Game::Initialize() {
     SDL_GetCurrentDisplayMode(0, &displayMode);
     windowWidth = 800;   // displayMode.w;
     windowHeight = 600;  // displayMode.h;
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0); // Can set SDL_WINDOW_BORDERLESS in last pos
     if (!window) {
         Logger::Err("Error creating SDL Window.");
         return;
@@ -36,7 +39,7 @@ void Game::Initialize() {
         return;
     }
 
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     isRunning = true;
 }
 
@@ -56,7 +59,9 @@ void Game::ProcessInput() {
 
 void Game::Setup() {
     Entity tank = registry->CreateEntity();
-    Entity bike = registry->CreateEntity();
+
+    registry->AddComponent<TransformComponent>(tank, glm::vec2{10.0, 30.0}, glm::vec2{1.0, 1.0}, 0.0);
+    registry->AddComponent<RigidBodyComponent>(tank, glm::vec2{50.0, 50.0});
 }
 
 void Game::Update() {
