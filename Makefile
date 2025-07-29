@@ -5,7 +5,8 @@ INCLUDE_PATHS = -I./libs
 SRC_FILES = ./src/*.cpp \
 			./src/Game/*.cpp \
 			./src/Logger/*.cpp \
-			./src/ECS/*.cpp
+			./src/ECS/*.cpp \
+			./src/AssetStore/*.cpp
 SDL_CFLAGS = `sdl2-config --cflags`
 SDL_LIBS = `sdl2-config --libs`
 LINKER_FLAGS = -lSDL2_image -lSDL2_ttf -lSDL2_mixer -llua
