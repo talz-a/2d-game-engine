@@ -1,7 +1,8 @@
 #pragma once
 
-#include <SDL.h>
 #include "../ECS/ECS.hpp"
+
+#include <SDL.h>
 
 inline constexpr int FPS = 60;
 inline constexpr int MILLISECS_PER_FRAME = 1000 / FPS;

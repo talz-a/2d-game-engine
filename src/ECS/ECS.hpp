@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Logger/Logger.hpp"
+
 #include <bitset>
 #include <vector>
 #include <unordered_map>
@@ -41,7 +42,6 @@ class Entity {
         bool operator !=(const Entity& other) const { return id != other.id; }
         bool operator >(const Entity& other) const { return id > other.id; }
         bool operator <(const Entity& other) const { return id < other.id; }
-
 
         template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
         template <typename TComponent> void RemoveComponent();
@@ -84,6 +84,7 @@ template <typename T> class Pool: public IPool {
         void Clear() { data.clear(); }
         void Add(T object) { data.push_back(object); }
         void Set(int index, T object) { data[index] = object; }
+
         T& Get(int index) { return static_cast<T&>(data[index]); }
         T& operator [](unsigned int index) { return data[index]; }
 };
@@ -109,6 +110,8 @@ class Registry {
         void Update();
         Entity CreateEntity();
 
+        void AddEntityToSystems(Entity entity);
+
         template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
         template <typename TComponent> void RemoveComponent(Entity entity);
         template <typename TComponent> bool HasComponent(Entity entity) const;
@@ -118,8 +121,6 @@ class Registry {
         template <typename TSystem> void RemoveSystem();
         template <typename TSystem> bool HasSystem() const;
         template <typename TSystem> TSystem& GetSystem() const;
-
-        void AddEntityToSystems(Entity entity);
 };
 
 
