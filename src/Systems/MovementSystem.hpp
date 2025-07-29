@@ -19,7 +19,7 @@ class MovementSystem: public System {
                 const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
                 transform.position.x += rigidBody.velocity.x * deltaTime;
                 transform.position.y += rigidBody.velocity.y * deltaTime;
-                Logger::Log(std::format("entity id {} is now at position ({}, {})", entity.GetId(), transform.position.x, transform.position.y));
+                // Logger::Log(std::format("entity id {} is now at position ({}, {})", entity.GetId(), transform.position.x, transform.position.y));
             }
         }
 };
