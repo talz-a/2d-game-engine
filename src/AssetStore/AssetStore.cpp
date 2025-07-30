@@ -28,7 +28,7 @@ void AssetStore::AddTexture(SDL_Renderer* renderer, const std::string& assetId, 
         return;
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (!texture) {
+    if (!texture) {
         Logger::Err(std::format("Failed to create texture from '{}': {}", filePath, SDL_GetError()));
         return;
     }
