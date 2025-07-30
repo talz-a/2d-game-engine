@@ -11,6 +11,10 @@
 #include <SDL_image.h>
 #include <glm/glm.hpp>
 #include <memory>
+#include <fstream>
+#include <string>
+#include <ranges>
+#include <string_view>
 
 Game::Game() {
     isRunning = false;
@@ -61,12 +65,34 @@ void Game::ProcessInput() {
     }
 }
 
-void Game::Setup() {
+void Game::LoadLevel(int level) {
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+    assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
+
+    int tileSize = 32;
+    double tileScale = 1.0;
+    if (std::ifstream mapFile{"./assets/tilemaps/jungle.map"}; mapFile) {
+        auto lines = std::views::istream<std::string>(mapFile);
+        for (auto [rowIdx, line] : std::views::enumerate(lines)) {
+            auto tiles = std::views::split(line, ',');
+            for (auto [colIdx, part] : std::views::enumerate(tiles)) {
+                std::string_view tileView(part);
+                int srcRectY = (tileView[0] - '0') * tileSize;
+                int srcRectX = (tileView[1] - '0') * tileSize;
+                Entity tile = registry->CreateEntity();
+                tile.AddComponent<TransformComponent>(
+                        glm::vec2{colIdx * tileSize * tileScale, rowIdx * tileSize * tileScale},
+                        glm::vec2{tileScale, tileScale},
+                        0.0
+                );
+                tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
+            }
+        }
+    }
 
     Entity tank = registry->CreateEntity();
     tank.AddComponent<TransformComponent>(glm::vec2{10.0, 10.0}, glm::vec2{1.0, 1.0}, 0.0);
@@ -79,6 +105,10 @@ void Game::Setup() {
     truck.AddComponent<SpriteComponent>("truck-image", 32, 32);
 }
 
+void Game::Setup() {
+    LoadLevel(1);
+}
+
 void Game::Update() {
     int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
     if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
@@ -86,7 +116,7 @@ void Game::Update() {
     float deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
     millisecsPreviousFrame = SDL_GetTicks();
 
-    // process entities that are waiting to be added/deleted
+    // Process entities that are waiting to be added/deleted
     registry->Update();
 
     registry->GetSystem<MovementSystem>().Update(deltaTime);

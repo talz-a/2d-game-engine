@@ -99,7 +99,7 @@ class Registry {
         // [vector index = entity id]
         std::vector<Signature> entityComponentSignatures;
 
-        // [Map key = system type id]
+        // [map key = system type id]
         std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
         std::set<Entity> entitiesToBeAdded;
