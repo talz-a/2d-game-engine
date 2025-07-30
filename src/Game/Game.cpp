@@ -33,9 +33,9 @@ void Game::Initialize() {
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = 800;   // displayMode.w;
-    windowHeight = 600;  // displayMode.h;
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0); // Can set SDL_WINDOW_BORDERLESS in last pos
+    windowWidth = 800; // For fullscreen set = displayMode.w;
+    windowHeight = 600; // For fullscreen set = displayMode.h;
+    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0); // Can set SDL_WINDOW_BORDERLESS in last position.
     if (!window) {
         Logger::Err("Error creating SDL Window.");
         return;
@@ -73,6 +73,7 @@ void Game::LoadLevel(int level) {
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
     assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
+    // Load tilemap.
     int tileSize = 32;
     double tileScale = 1.0;
     if (std::ifstream mapFile{"./assets/tilemaps/jungle.map"}; mapFile) {
@@ -116,7 +117,7 @@ void Game::Update() {
     float deltaTime = (SDL_GetTicks() - millisecsPreviousFrame) / 1000.0;
     millisecsPreviousFrame = SDL_GetTicks();
 
-    // Process entities that are waiting to be added/deleted
+    // Process entities that are waiting to be added/deleted.
     registry->Update();
 
     registry->GetSystem<MovementSystem>().Update(deltaTime);
