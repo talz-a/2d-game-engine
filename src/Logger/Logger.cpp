@@ -1,7 +1,6 @@
 #include "Logger.hpp"
 
 #include <chrono>
-#include <iostream>
 #include <print>
 
 constexpr auto GREEN_COLOR = "\e[0;32m";
@@ -14,7 +13,7 @@ void Logger::Log(const std::string& message) {
         .type = LogType::LOG_INFO,
         .message = logString,
     };
-    std::cout << GREEN_COLOR << logEntry.message << RESET_COLOR << std::endl;
+    std::println("{}{}{}", GREEN_COLOR ,logEntry.message, RESET_COLOR);
     messages.push_back(logEntry);
 }
 
@@ -24,6 +23,6 @@ void Logger::Err(const std::string& message) {
         .type = LogType::LOG_ERROR,
         .message = errString,
     };
-    std::cerr << RED_COLOR << logEntry.message << RESET_COLOR << std::endl;
+    std::println("{}{}{}", RED_COLOR, logEntry.message, RESET_COLOR);
     messages.push_back(logEntry);
 }

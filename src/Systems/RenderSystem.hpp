@@ -5,8 +5,8 @@
 #include "../Components/SpriteComponent.hpp"
 #include "../AssetStore/AssetStore.hpp"
 
-#include <format>
 #include <SDL.h>
+#include <algorithm>
 
 class RenderSystem: public System {
     public:
@@ -16,12 +16,17 @@ class RenderSystem: public System {
         }
 
         void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
-            for (auto entity : GetSystemEntities()) {
+            // TODO: sort all the entities of our system by z-index;
+            std::vector<Entity> systemEntites = GetSystemEntities();
+            std::ranges::sort(systemEntites, std::less<>(), [](const Entity& entity) {
+                return entity.GetComponent<SpriteComponent>().zIndex;
+            });
+
+            for (auto entity : systemEntites) {
                 const auto transform = entity.GetComponent<TransformComponent>();
                 const auto sprite = entity.GetComponent<SpriteComponent>();
 
                 SDL_Rect srcRect = sprite.srcRect;
-
                 SDL_Rect dstRect = {
                     .x = static_cast<int>(transform.position.x),
                     .y = static_cast<int>(transform.position.y),
