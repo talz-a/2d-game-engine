@@ -73,27 +73,27 @@ void Game::LoadLevel(int level) {
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
     assetStore->AddTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
-    // Load tilemap.
+    // Load the tilemap
     int tileSize = 32;
     double tileScale = 1.0;
-    if (std::ifstream mapFile{"./assets/tilemaps/jungle.map"}; mapFile) {
-        auto lines = std::views::istream<std::string>(mapFile);
-        for (auto [rowIdx, line] : std::views::enumerate(lines)) {
-            auto tiles = std::views::split(line, ',');
-            for (auto [colIdx, part] : std::views::enumerate(tiles)) {
-                std::string_view tileView(part);
-                int srcRectY = (tileView[0] - '0') * tileSize;
-                int srcRectX = (tileView[1] - '0') * tileSize;
-                Entity tile = registry->CreateEntity();
-                tile.AddComponent<TransformComponent>(
-                        glm::vec2{colIdx * tileSize * tileScale, rowIdx * tileSize * tileScale},
-                        glm::vec2{tileScale, tileScale},
-                        0.0
-                );
-                tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
-            }
+    int mapNumCols = 25;
+    int mapNumRows = 20;
+    std::fstream mapFile;
+    mapFile.open("./assets/tilemaps/jungle.map");
+    for (int y = 0; y < mapNumRows; y++) {
+        for (int x = 0; x < mapNumCols; x++) {
+            char ch;
+            mapFile.get(ch);
+            int srcRectY = std::atoi(&ch) * tileSize;
+            mapFile.get(ch);
+            int srcRectX = std::atoi(&ch) * tileSize;
+            mapFile.ignore();
+            Entity tile = registry->CreateEntity();
+            tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
+            tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, srcRectX, srcRectY);
         }
     }
+    mapFile.close();
 
     Entity tank = registry->CreateEntity();
     tank.AddComponent<TransformComponent>(glm::vec2{10.0, 10.0}, glm::vec2{1.0, 1.0}, 0.0);
