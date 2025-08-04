@@ -16,7 +16,6 @@ class RenderSystem: public System {
         }
 
         void Update(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
-            // TODO: sort all the entities of our system by z-index;
             std::vector<Entity> systemEntites = GetSystemEntities();
             std::ranges::sort(systemEntites, std::less<>(), [](const Entity& entity) {
                 return entity.GetComponent<SpriteComponent>().zIndex;
