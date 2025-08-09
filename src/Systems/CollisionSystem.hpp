@@ -30,6 +30,7 @@ class CollisionSystem: public System {
 
                     bool collisionHappened = CheckAABBCollision(aTransform.position.x + aCollider.offset.x, aTransform.position.y + aCollider.offset.y, aCollider.width, aCollider.height, bTransform.position.x + bCollider.offset.x, bTransform.position.y + bCollider.offset.y, bCollider.width, bCollider.height);
                     if (collisionHappened) {
+                        // FIXME: only works for 2 entites with collision component
                         aCollider.currentlyColliding = true;
                         bCollider.currentlyColliding = true;
                         Logger::Log(std::format("Entity {} is colliding with Entity {}", a.GetId(), b.GetId()));
@@ -43,11 +44,6 @@ class CollisionSystem: public System {
         }
 
         bool CheckAABBCollision(double aX, double aY, double aW, double aH, double bX, double bY, double bW, double bH) {
-            return (
-                    aX < bX + bW &&
-                    aX + aW > bX &&
-                    aY < bY + bH &&
-                    aY + aH > bY
-            );
+            return  aX < bX + bW && aX + aW > bX && aY < bY + bH && aY + aH > bY;
         }
 };

@@ -23,6 +23,7 @@ class RenderColliderSystem: public System {
                     .w = static_cast<int>(boxColider.width),
                     .h = static_cast<int>(boxColider.height),
                 };
+                // FIXME: only works for 2 entites with collision component
                 if (boxColider.currentlyColliding) {
                     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
                 } else {
