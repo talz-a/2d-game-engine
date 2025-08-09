@@ -18,7 +18,7 @@ class CollisionSystem: public System {
             for (auto i = entities.begin(); i != entities.end(); i++) {
                 Entity a = *i;
                 auto aTransform = a.GetComponent<TransformComponent>();
-                auto aCollider = a.GetComponent<BoxColliderComponent>();
+                auto& aCollider = a.GetComponent<BoxColliderComponent>();
 
                 for (auto j = i; j != entities.end(); j ++) {
                     Entity b = *j;
@@ -26,12 +26,17 @@ class CollisionSystem: public System {
                     if (a == b) continue;
 
                     auto bTransform = b.GetComponent<TransformComponent>();
-                    auto bCollider = b.GetComponent<BoxColliderComponent>();
+                    auto& bCollider = b.GetComponent<BoxColliderComponent>();
 
                     bool collisionHappened = CheckAABBCollision(aTransform.position.x + aCollider.offset.x, aTransform.position.y + aCollider.offset.y, aCollider.width, aCollider.height, bTransform.position.x + bCollider.offset.x, bTransform.position.y + bCollider.offset.y, bCollider.width, bCollider.height);
                     if (collisionHappened) {
+                        aCollider.currentlyColliding = true;
+                        bCollider.currentlyColliding = true;
                         Logger::Log(std::format("Entity {} is colliding with Entity {}", a.GetId(), b.GetId()));
                         // TODO: handle event here...
+                    } else {
+                        aCollider.currentlyColliding = false;
+                        bCollider.currentlyColliding = false;
                     }
                 }
             }
