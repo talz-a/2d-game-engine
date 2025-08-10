@@ -30,11 +30,14 @@ class CollisionSystem: public System {
 
                     bool collisionHappened = CheckAABBCollision(aTransform.position.x + aCollider.offset.x, aTransform.position.y + aCollider.offset.y, aCollider.width, aCollider.height, bTransform.position.x + bCollider.offset.x, bTransform.position.y + bCollider.offset.y, bCollider.width, bCollider.height);
                     if (collisionHappened) {
+                        Logger::Log(std::format("Entity {} is colliding with Entity {}", a.GetId(), b.GetId()));
+
                         // FIXME: only works for 2 entites with collision component
                         aCollider.currentlyColliding = true;
                         bCollider.currentlyColliding = true;
-                        Logger::Log(std::format("Entity {} is colliding with Entity {}", a.GetId(), b.GetId()));
-                        // TODO: handle event here...
+
+                        // TODO: Emit an event here.
+
                     } else {
                         aCollider.currentlyColliding = false;
                         bCollider.currentlyColliding = false;
