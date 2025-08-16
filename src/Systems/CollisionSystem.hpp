@@ -3,6 +3,8 @@
 #include "../ECS/ECS.hpp"
 #include "../Components/BoxColliderComponent.hpp"
 #include "../Components/TransformComponent.hpp"
+#include "../Events/CollisionEvent.hpp"
+#include "../EventBus/EventBus.hpp"
 
 #include <format>
 
@@ -13,7 +15,7 @@ class CollisionSystem: public System {
             RequireComponent<TransformComponent>();
         }
 
-        void Update() {
+        void Update(std::unique_ptr<EventBus>& eventBus) {
             std::vector<Entity> entities = GetSystemEntities();
             for (auto i = entities.begin(); i != entities.end(); i++) {
                 Entity a = *i;
@@ -36,8 +38,7 @@ class CollisionSystem: public System {
                         aCollider.currentlyColliding = true;
                         bCollider.currentlyColliding = true;
 
-                        // TODO: Emit an event here.
-
+                        eventBus->EmitEvent<CollisionEvent>(a, b);
                     } else {
                         aCollider.currentlyColliding = false;
                         bCollider.currentlyColliding = false;

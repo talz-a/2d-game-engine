@@ -52,6 +52,9 @@ class EventBus {
             Logger::Log("EventBus deconstructor called!");
         }
 
+        // Clear subscribers.
+        void Reset() { subscribers.clear(); }
+
         // Listener subscribes to an event: eventBus->SubscribeToEvent<CollisonEvent>(this, &Game::onCollision);
         template<typename TEvent, typename TOwner>
         void SubscribeToEvent(TOwner* ownerInstance, void (TOwner::*callbackFunction)(TEvent&)) {
