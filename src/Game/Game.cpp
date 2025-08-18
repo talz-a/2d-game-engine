@@ -12,6 +12,7 @@
 #include "../Systems/AnimationSystem.hpp"
 #include "../Systems/RenderColliderSystem.hpp"
 #include "../Systems/DamageSystem.hpp"
+#include "../Systems/KeyboardMovementSystem.hpp"
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -57,20 +58,6 @@ void Game::Initialize() {
     isRunning = true;
 }
 
-void Game::ProcessInput() {
-    SDL_Event sdlEvent;
-    while (SDL_PollEvent(&sdlEvent)) {
-        switch (sdlEvent.type) {
-            case SDL_QUIT:
-                isRunning = false;
-                break;
-            case SDL_KEYDOWN:
-                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) isRunning = false;
-                if (sdlEvent.key.keysym.sym == SDLK_d) isDebug = !isDebug;
-                break;
-        }
-    }
-}
 
 void Game::LoadLevel(int level) {
     registry->AddSystem<MovementSystem>();
@@ -79,6 +66,7 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<CollisionSystem>();
     registry->AddSystem<RenderColliderSystem>();
     registry->AddSystem<DamageSystem>();
+    registry->AddSystem<KeyboardMovementSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -138,6 +126,22 @@ void Game::Setup() {
     LoadLevel(1);
 }
 
+void Game::ProcessInput() {
+    SDL_Event sdlEvent;
+    while (SDL_PollEvent(&sdlEvent)) {
+        switch (sdlEvent.type) {
+            case SDL_QUIT:
+                isRunning = false;
+                break;
+            case SDL_KEYDOWN:
+                if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) isRunning = false;
+                if (sdlEvent.key.keysym.sym == SDLK_d) isDebug = !isDebug;
+                eventBus->EmitEvent<KeyPressEvent>(sdlEvent.key.keysym.sym);
+                break;
+        }
+    }
+}
+
 void Game::Update() {
     int timeToWait = MILLISECS_PER_FRAME - (SDL_GetTicks() - millisecsPreviousFrame);
     if (timeToWait > 0 && timeToWait <= MILLISECS_PER_FRAME) SDL_Delay(timeToWait);
@@ -150,6 +154,7 @@ void Game::Update() {
 
     // Perform the subscription of the events for all systems.
     registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+    registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
 
     // Process entities that are waiting to be added/deleted.
     registry->Update();
