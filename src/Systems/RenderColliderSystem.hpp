@@ -13,15 +13,15 @@ class RenderColliderSystem: public System {
             RequireComponent<TransformComponent>();
         }
 
-        void Update(SDL_Renderer* renderer) {
+        void Update(SDL_Renderer* renderer, SDL_Rect camera) {
             for (auto entity : GetSystemEntities()) {
                 auto transform = entity.GetComponent<TransformComponent>();
                 auto boxColider = entity.GetComponent<BoxColliderComponent>();
                 SDL_Rect boxColliderRect = {
-                    .x = static_cast<int>(transform.position.x),
-                    .y = static_cast<int>(transform.position.y),
-                    .w = static_cast<int>(boxColider.width),
-                    .h = static_cast<int>(boxColider.height),
+                    .x = static_cast<int>(transform.position.x + boxColider.offset.x - camera.x),
+                    .y = static_cast<int>(transform.position.y + boxColider.offset.y - camera.y),
+                    .w = static_cast<int>(boxColider.width * transform.scale.x),
+                    .h = static_cast<int>(boxColider.height * transform.scale.y),
                 };
                 // FIXME: only works for 2 entites with collision component
                 if (boxColider.currentlyColliding) {

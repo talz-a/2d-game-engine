@@ -194,7 +194,7 @@ void Game::Render() {
 
     registry->GetSystem<RenderSystem>().Update(renderer, camera, assetStore);
 
-    if (isDebug) registry->GetSystem<RenderColliderSystem>().Update(renderer);
+    if (isDebug) registry->GetSystem<RenderColliderSystem>().Update(renderer, camera);
 
     SDL_RenderPresent(renderer);
 }
