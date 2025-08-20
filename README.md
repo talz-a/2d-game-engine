@@ -36,7 +36,7 @@ brew install sdl2 lua
 
 ```bash
 make
-./build/engine    # or the binary produced by your Makefile
+.gameengine
 ```
 
 ### Project Structure
