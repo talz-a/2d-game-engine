@@ -1,4 +1,4 @@
-CXX = c++
+CXX = clang++
 LANG_STD = -std=c++23
 COMPILER_FLAGS = -Wall -Wfatal-errors
 INCLUDE_PATHS = -I./libs
