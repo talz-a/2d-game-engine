@@ -7,6 +7,7 @@
 #include "../Components/AnimationComponent.hpp"
 #include "../Components/BoxColliderComponent.hpp"
 #include "../Components/KeyboardControlledComponent.hpp"
+#include "../Components/CameraFollowComponent.hpp"
 #include "../Systems/MovementSystem.hpp"
 #include "../Systems/RenderSystem.hpp"
 #include "../Systems/CollisionSystem.hpp"
@@ -14,6 +15,7 @@
 #include "../Systems/RenderColliderSystem.hpp"
 #include "../Systems/DamageSystem.hpp"
 #include "../Systems/KeyboardMovementSystem.hpp"
+#include "../Systems/CameraMovementSystem.hpp"
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -21,6 +23,11 @@
 #include <memory>
 #include <fstream>
 #include <string>
+
+int Game::windowWidth;
+int Game::windowHeight;
+int Game::mapWidth;
+int Game::mapHeight;
 
 Game::Game() {
     isRunning = false;
@@ -41,6 +48,10 @@ void Game::Initialize() {
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
+
+    // windowWidth = displayMode.w; // For fullscreen set = displayMode.w;
+    // windowHeight = displayMode.h; // For fullscreen set = displayMode.h;
+
     windowWidth = 800; // For fullscreen set = displayMode.w;
     windowHeight = 600; // For fullscreen set = displayMode.h;
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, 0); // Can set SDL_WINDOW_BORDERLESS in last position.
@@ -55,6 +66,12 @@ void Game::Initialize() {
         return;
     }
 
+    // Initialize the camera view with the entire screen.
+    camera.y = 0;
+    camera.x = 0;
+    camera.w = windowWidth;
+    camera.h = windowHeight;
+
     // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     isRunning = true;
 }
@@ -68,6 +85,7 @@ void Game::LoadLevel(int level) {
     registry->AddSystem<RenderColliderSystem>();
     registry->AddSystem<DamageSystem>();
     registry->AddSystem<KeyboardMovementSystem>();
+    registry->AddSystem<CameraMovementSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -92,29 +110,25 @@ void Game::LoadLevel(int level) {
             mapFile.ignore();
             Entity tile = registry->CreateEntity();
             tile.AddComponent<TransformComponent>(glm::vec2(x * (tileScale * tileSize), y * (tileScale * tileSize)), glm::vec2(tileScale, tileScale), 0.0);
-            tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, srcRectX, srcRectY);
+            tile.AddComponent<SpriteComponent>("tilemap-image", tileSize, tileSize, 0, false, srcRectX, srcRectY);
         }
     }
     mapFile.close();
+    mapWidth = mapNumCols * tileSize * tileScale;
+    mapHeight = mapNumRows * tileSize * tileScale;
 
     Entity chopper = registry->CreateEntity();
     chopper.AddComponent<TransformComponent>(glm::vec2{10.0, 100.0}, glm::vec2{1.0, 1.0}, 0.0);
     chopper.AddComponent<RigidBodyComponent>(glm::vec2{0.0, 0.0});
     chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
     chopper.AddComponent<AnimationComponent>(2, 15, true);
-    chopper.AddComponent<KeyboardControlledComponent>(glm::vec2{0, -20}, glm::vec2{20, 0}, glm::vec2{0, 20}, glm::vec2{-20, 0});
-
-    Entity chopperB = registry->CreateEntity();
-    chopperB.AddComponent<TransformComponent>(glm::vec2{70.0, 100.0}, glm::vec2{1.0, 1.0}, 0.0);
-    chopperB.AddComponent<RigidBodyComponent>(glm::vec2{0.0, 0.0});
-    chopperB.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
-    chopperB.AddComponent<AnimationComponent>(2, 15, true);
-    chopperB.AddComponent<KeyboardControlledComponent>(glm::vec2{0, -50}, glm::vec2{50, 0}, glm::vec2{0, 50}, glm::vec2{-50, 0});
+    chopper.AddComponent<KeyboardControlledComponent>(glm::vec2{0, -80}, glm::vec2{80, 0}, glm::vec2{0, 80}, glm::vec2{-80, 0});
+    chopper.AddComponent<CameraFollowComponent>();
 
     Entity radar = registry->CreateEntity();
     radar.AddComponent<TransformComponent>(glm::vec2{windowWidth - 74, 10.0}, glm::vec2{1.0, 1.0}, 0.0);
     radar.AddComponent<RigidBodyComponent>(glm::vec2{0.0, 0.0});
-    radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2);
+    radar.AddComponent<SpriteComponent>("radar-image", 64, 64, 2, true);
     radar.AddComponent<AnimationComponent>(8, 5, true);
 
     Entity tank = registry->CreateEntity();
@@ -171,13 +185,14 @@ void Game::Update() {
     registry->GetSystem<MovementSystem>().Update(deltaTime);
     registry->GetSystem<AnimationSystem>().Update();
     registry->GetSystem<CollisionSystem>().Update(eventBus);
+    registry->GetSystem<CameraMovementSystem>().Update(camera);
 }
 
 void Game::Render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
-    registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
+    registry->GetSystem<RenderSystem>().Update(renderer, camera, assetStore);
 
     if (isDebug) registry->GetSystem<RenderColliderSystem>().Update(renderer);
 
