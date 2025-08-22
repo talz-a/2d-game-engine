@@ -19,8 +19,9 @@ class DamageSystem: public System {
 
         void onCollision(CollisionEvent& event) {
             Logger::Log(std::format("The Damage system recieved an event collision between entities {} and {}", event.a.GetId(), event.b.GetId()));
-            event.a.Kill();
-            event.b.Kill();
+
+            // event.a.Kill();
+            // event.b.Kill();
         }
 
         void Update() {
