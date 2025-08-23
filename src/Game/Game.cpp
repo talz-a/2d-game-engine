@@ -130,6 +130,7 @@ void Game::LoadLevel(int level) {
     chopper.AddComponent<RigidBodyComponent>(glm::vec2{0.0, 0.0});
     chopper.AddComponent<SpriteComponent>("chopper-image", 32, 32, 1);
     chopper.AddComponent<AnimationComponent>(2, 15, true);
+    chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2{150.0 , 150.0}, 0, 10000, 0, true);
     chopper.AddComponent<KeyboardControlledComponent>(glm::vec2{0, -80}, glm::vec2{80, 0}, glm::vec2{0, 80}, glm::vec2{-80, 0});
     chopper.AddComponent<CameraFollowComponent>();
     chopper.AddComponent<HealthComponent>(100);
@@ -171,7 +172,7 @@ void Game::ProcessInput() {
             case SDL_KEYDOWN:
                 if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) isRunning = false;
                 if (sdlEvent.key.keysym.sym == SDLK_d) isDebug = !isDebug;
-                eventBus->EmitEvent<KeyPressEvent>(sdlEvent.key.keysym.sym);
+                eventBus->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
                 break;
         }
     }
@@ -190,6 +191,7 @@ void Game::Update() {
     // Perform the subscription of the events for all systems.
     registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
     registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
+    registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);
 
     // Process entities that are waiting to be added/deleted.
     registry->Update();

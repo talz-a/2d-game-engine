@@ -18,10 +18,10 @@ class KeyboardMovementSystem: public System {
         }
 
         void SubscribeToEvents(std::unique_ptr<EventBus>& eventBus) {
-            eventBus->SubscribeToEvent<KeyPressEvent>(this, &KeyboardMovementSystem::onKeyPressedEvent);
+            eventBus->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardMovementSystem::onKeyPressed);
         }
 
-        void onKeyPressedEvent(KeyPressEvent &event) {
+        void onKeyPressed(KeyPressedEvent& event) {
             for (auto entity: GetSystemEntities()) {
                 const auto keyboardControl = entity.GetComponent<KeyboardControlledComponent>();
                 auto& sprite = entity.GetComponent<SpriteComponent>();
