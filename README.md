@@ -16,7 +16,7 @@ A lightweight 2D game engine focused on **data-oriented design**, with a custom 
 ## Tech
 
 * C++23, SDL2
-* Makefile-based build
+* CMake build system
 
 ## Getting Started
 
@@ -25,25 +25,33 @@ A lightweight 2D game engine focused on **data-oriented design**, with a custom 
 * C++ compiler with C++23 support (clang++ or g++)
 * SDL2 development libraries
 * Lua (e.g., Lua 5.4)
-* Make
+* CMake 3.31+
+
+On Fedora:
+
+```bash
+sudo dnf install sdl2-compat-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel lua-devel
+```
 
 On macOS (Homebrew):
 
 ```bash
-brew install sdl2 lua
+brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer lua
 ```
+
 ### Build & Run
 
 ```bash
-make
-.gameengine
+cmake -B build
+cmake --build build
+./build/gameengine
 ```
 
 ### Project Structure
 
 ```
-├─ assets/        # sprites and levels
-├─ libs/          # third-party
-├─ src/           # engine source (ECS, renderer, systems)
-└─ Makefile
+├─ assets/          # sprites and levels
+├─ libs/            # third-party
+├─ src/             # engine source (ECS, renderer, systems)
+└─ CMakeLists.txt
 ```
