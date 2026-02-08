@@ -3,30 +3,37 @@
 
 int IComponent::nextId = 0;
 
-int Entity::GetId() const { return id; }
+int Entity::GetId() const {
+    return id;
+}
 
 void Entity::Kill() {
     registry->KillEntity(*this);
 }
 
-void System::AddEntityToSystem(Entity entity) { entities.push_back(entity); }
-
-void System::RemoveEntityFromSystem(Entity entity) {
-    std::erase_if(entities, [&entity](Entity other) {
-        return entity == other;
-    });
+void System::AddEntityToSystem(Entity entity) {
+    entities.push_back(entity);
 }
 
-std::vector<Entity> System::GetSystemEntities() const { return entities; }
+void System::RemoveEntityFromSystem(Entity entity) {
+    std::erase_if(entities, [&entity](Entity other) { return entity == other; });
+}
 
-const Signature& System::GetComponentSignature() const { return componentSignature; }
+std::vector<Entity> System::GetSystemEntities() const {
+    return entities;
+}
+
+const Signature& System::GetComponentSignature() const {
+    return componentSignature;
+}
 
 Entity Registry::CreateEntity() {
     int entityId;
 
     if (freeIds.empty()) {
         entityId = numEntities++;
-        if (entityId >= static_cast<int>(entityComponentSignatures.size())) entityComponentSignatures.resize(entityId + 1);
+        if (entityId >= static_cast<int>(entityComponentSignatures.size()))
+            entityComponentSignatures.resize(entityId + 1);
     } else {
         entityId = freeIds.front();
         freeIds.pop_front();
@@ -48,9 +55,10 @@ void Registry::AddEntityToSystems(Entity entity) {
     const auto entityId = entity.GetId();
     const auto& entityComponentSignature = entityComponentSignatures[entityId];
 
-    for (auto &system: systems) {
+    for (auto& system : systems) {
         const auto& systemComponentSignature = system.second->GetComponentSignature();
-        bool isInterested = (entityComponentSignature & systemComponentSignature) == systemComponentSignature;
+        bool isInterested =
+            (entityComponentSignature & systemComponentSignature) == systemComponentSignature;
         if (isInterested) system.second->AddEntityToSystem(entity);
     }
 }
@@ -62,12 +70,12 @@ void Registry::RemoveEntityFromSystems(Entity entity) {
 }
 
 void Registry::Update() {
-    for (auto entity: entitiesToBeAdded) {
+    for (auto entity : entitiesToBeAdded) {
         AddEntityToSystems(entity);
     }
     entitiesToBeAdded.clear();
 
-    for (auto entity: entitiesToBeKilled) {
+    for (auto entity : entitiesToBeKilled) {
         RemoveEntityFromSystems(entity);
 
         // Clear components for entity.

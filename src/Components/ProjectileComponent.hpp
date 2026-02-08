@@ -10,8 +10,7 @@ struct ProjectileComponent {
 
     ProjectileComponent(bool isFriendly = false, int hitPercentage = 0, int duaration = 0)
         : isFriendly{isFriendly},
-        hitPercentage{hitPercentage},
-        duaration{duaration},
-        startTime{SDL_GetTicks()}
-    { }
+          hitPercentage{hitPercentage},
+          duaration{duaration},
+          startTime{SDL_GetTicks()} {}
 };

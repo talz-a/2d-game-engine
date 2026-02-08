@@ -1,9 +1,9 @@
 #include "AssetStore.hpp"
 #include "../Logger/Logger.hpp"
 
-#include <string>
-#include <format>
 #include <SDL.h>
+#include <format>
+#include <string>
 
 AssetStore::AssetStore() {
     Logger::Log("AssetStore constructor called!");
@@ -21,7 +21,11 @@ void AssetStore::ClearAssets() {
     textures.clear();
 }
 
-void AssetStore::AddTexture(SDL_Renderer* renderer, const std::string& assetId, const std::string& filePath) {
+void AssetStore::AddTexture(
+    SDL_Renderer* renderer,
+    const std::string& assetId,
+    const std::string& filePath
+) {
     SDL_Surface* surface = IMG_Load(filePath.c_str());
     if (!surface) {
         Logger::Err(std::format("Failed to load image '{}': {}", filePath, IMG_GetError()));
@@ -29,7 +33,9 @@ void AssetStore::AddTexture(SDL_Renderer* renderer, const std::string& assetId, 
     }
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!texture) {
-        Logger::Err(std::format("Failed to create texture from '{}': {}", filePath, SDL_GetError()));
+        Logger::Err(
+            std::format("Failed to create texture from '{}': {}", filePath, SDL_GetError())
+        );
         return;
     }
     SDL_FreeSurface(surface);
